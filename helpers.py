@@ -5,10 +5,20 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data"
 
-def load_csv(filename: str) -> pd.DataFrame:
-    path = DATA_DIR / filename
+def load_csv(filename):
+    data_dir = Path(__file__).resolve().parent / "data"
+    path = data_dir / filename
+
+    if not path.exists():
+        # Render/Linux is case-sensitive, so find the CSV ignoring case
+        for file in data_dir.iterdir():
+            if file.name.lower() == filename.lower():
+                path = file
+                break
+
     if not path.exists():
         raise FileNotFoundError(f"Missing file: {path}")
+
     return pd.read_csv(path)
 
 def normalize_level_id(level_input: str, df):
